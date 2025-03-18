@@ -319,7 +319,7 @@ class Expander:
         if isinstance(thing, dict):
             return {self.expand(k): self.expand(v) for (k, v) in thing.items()}
 
-        if (thing is None) or isinstance(thing, bool) or isinstance(thing, int) or isinstance(thing, float):
+        if (thing is None) or isinstance(thing, (bool, int, float)):
             return thing
 
         var = substr = replacer = ''
