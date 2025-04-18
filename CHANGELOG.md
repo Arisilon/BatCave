@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### [46.0.0] - Unreleased
 
 - Changed:
-  -
+  - Fixed issue with creating an Image instance for an remote registry. (GitHub #128)
 
 - Removed:
   - Removed support for Google Container Registry. (GitHub #127)

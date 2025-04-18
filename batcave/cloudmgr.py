@@ -8,15 +8,15 @@ Attributes:
 # Import standard modules
 from ast import literal_eval
 from enum import Enum
-from json import loads as json_read
 from os import getenv
 from pathlib import Path
 from string import Template
-from typing import cast, Any, List, Optional, Sequence
+from typing import Any, cast, List, Optional, Sequence
 
 # Import third-party modules
 from docker import DockerClient
 from docker.models.containers import Container as DockerContainer
+from requests import head as get_head
 
 # Import internal modules
 from .lang import BatCaveError, BatCaveException, CommandResult, WIN32
@@ -147,9 +147,6 @@ class Cloud:
 
         Returns:
             Nothing.
-
-        Raises:
-            CloudError.INVALID_OPERATION: If the value of self.ctype is not in CLOUD_TYPES.
         """
         self._client = DockerClient()
         if self.type == CloudType.dockerhub:
@@ -170,13 +167,16 @@ class Image:
             _docker_client: A reference to the client from the Docker API.
             _name: The value of the name argument.
             _ref: A reference to the underlying API object.
-
-        Raises:
-            CloudError.INVALID_OPERATION: If the specified cloud type is not supported.
         """
         self._cloud = cloud
         self._name = name
         self._docker_client: DockerClient = self.cloud.client if isinstance(self.cloud.client, DockerClient) else DockerClient()
+        if self._cloud.type == CloudType.dockerhub:
+            (image, tag) = self.name.split(':', 1)
+            response = get_head(f'https://registry.hub.docker.com/v2/{image}/manifests/{tag}', auth=cast(tuple, self._cloud.auth),
+                                headers={"Accept": "application/vnd.docker.distribution.manifest.v2+json"}, timeout=10)
+            if response.status_code != 200:
+                self._ref = None
         self._ref = self.cloud.client.images.get(self.name)
 
     def __enter__(self):
@@ -191,19 +191,13 @@ class Image:
     containers = property(lambda s: s.cloud.get_containers({'ancestor': s.name}),
                           doc='A read-only property which returns all the containers for this image.')
 
-    def get_tags(self, image_filter: Optional[str] = None, /) -> List[str]:
+    def get_tags(self) -> List[str]:
         """Get a list of tags applied to the image.
-
-        Args:
-            image_filter (optional, default=None): A filter to apply to the image list.
 
         Returns:
             The sorted list of tags applied to the image.
-
-        Raises:
-            CloudError.INVALID_OPERATION: If the cloud type does not support image tags.
         """
-        return self._ref.tags
+        return self._ref.tags if self._ref else []
 
     tags = property(get_tags, doc='A read-only property which calls the get_tags() method with no filters.')
 
@@ -254,12 +248,11 @@ class Image:
 
         Returns:
             The tagged image.
-
-        Raises:
-            CloudError.INVALID_OPERATION: If the cloud type does not support image tagging.
         """
         new_ref: Optional[Image] = None
         self.pull()
+        if self._ref is None:
+            raise CloudError(CloudError.IMAGE_ERROR, action='tag', err='Image not found')
         self._ref.tag(new_tag)
         (new_ref := Image(self.cloud, new_tag)).push()
         return new_ref

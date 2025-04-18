@@ -554,7 +554,7 @@ def pushd(dirname: PathName, /) -> PathName:
     Returns:
         The value of the directory pushed to the stack.
     """
-    global _DIRECTORY_STACK  # pylint: disable=global-statement,global-variable-not-assigned
+    global _DIRECTORY_STACK  # noqa:F824  # pylint: disable=global-variable-not-assigned
     cwd = Path.cwd()
     chdir(dirname)
     _DIRECTORY_STACK.append(cwd)
@@ -573,7 +573,7 @@ def popd() -> int | PathName:
     Raises:
         IndexError: If the stack is empty.
     """
-    global _DIRECTORY_STACK  # pylint: disable=global-statement,global-variable-not-assigned
+    global _DIRECTORY_STACK    # noqa:F824  # pylint: disable=global-variable-not-assigned
     try:
         dirname = _DIRECTORY_STACK.pop()
     except IndexError:
