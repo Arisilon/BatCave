@@ -7,12 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [46.0.0] - Unreleased
+
+- Changed:
+  -
+
+- Removed:
+  - Removed support for Google Container Registry. (GitHub #127)
+
+## Release History
+
 ### [45.0.2] - 2025-03-18
 
 - Changed:
   - Don't expand numeric values. (GitHub #126)
-
-## Release History
 
 ### [45.0.1] - 2025-02-16
 

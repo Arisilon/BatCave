@@ -151,17 +151,9 @@ class Cloud:
         Raises:
             CloudError.INVALID_OPERATION: If the value of self.ctype is not in CLOUD_TYPES.
         """
-        match self.type:
-            case CloudType.local | CloudType.dockerhub:
-                self._client = DockerClient()
-                if self.type == CloudType.dockerhub:
-                    self._client.login(*self.auth)
-            case CloudType.gcloud:
-                gcloud('auth', 'activate-service-account', key_file=Path(self.auth[0]), syscmd_args={'ignore_stderr': True})
-                gcloud('auth', 'configure-docker', syscmd_args={'ignore_stderr': True})
-                self._client = True
-            case _:
-                raise CloudError(CloudError.INVALID_OPERATION, ctype=self.type.name)
+        self._client = DockerClient()
+        if self.type == CloudType.dockerhub:
+            self._client.login(*self.auth)
 
 
 class Image:
@@ -185,14 +177,7 @@ class Image:
         self._cloud = cloud
         self._name = name
         self._docker_client: DockerClient = self.cloud.client if isinstance(self.cloud.client, DockerClient) else DockerClient()
-        self._ref: Any
-        match self.cloud.type:
-            case CloudType.local | CloudType.dockerhub:
-                self._ref = self.cloud.client.images.get(self.name)
-            case CloudType.gcloud:
-                self._ref = None
-            case _:
-                raise CloudError(CloudError.INVALID_OPERATION, ctype=self.cloud.type.name)
+        self._ref = self.cloud.client.images.get(self.name)
 
     def __enter__(self):
         return self
@@ -218,16 +203,7 @@ class Image:
         Raises:
             CloudError.INVALID_OPERATION: If the cloud type does not support image tags.
         """
-        match self.cloud.type:
-            case CloudType.local | CloudType.dockerhub:
-                return self._ref.tags
-            case CloudType.gcloud:
-                args: List[str] = ['--format=json']
-                if image_filter:
-                    args += ['--filter=' + image_filter]
-                image_list: List[str] = cast(List[str], self.cloud.exec('container', 'images', 'list-tags', self.name, *args, show_stdout=False, flatten_output=True))
-                return sorted([t for i in json_read(str(image_list)) for t in i['tags']])
-        raise CloudError(CloudError.INVALID_OPERATION, ctype=self.cloud.type.name)
+        return self._ref.tags
 
     tags = property(get_tags, doc='A read-only property which calls the get_tags() method with no filters.')
 
@@ -237,11 +213,8 @@ class Image:
         Returns:
             The image object.
         """
-        match self.cloud.type:
-            case CloudType.local | CloudType.dockerhub | CloudType.gcloud:
-                self._ref = self._docker_client.images.pull(self.name)
-                return self
-        raise CloudError(CloudError.INVALID_OPERATION, ctype=self.cloud.type.name)
+        self._ref = self._docker_client.images.pull(self.name)
+        return self
 
     def push(self) -> List[str]:
         """Push the image to the registry.
@@ -249,14 +222,11 @@ class Image:
         Returns:
             The server log from the push.
         """
-        match self.cloud.type:
-            case CloudType.local | CloudType.dockerhub | CloudType.gcloud:
-                docker_log = [literal_eval(line.strip()) for line in self._docker_client.images.push(self.name).splitlines() if line]
-                errors = [line['error'] for line in docker_log if 'error' in line]
-                if errors:
-                    raise CloudError(CloudError.IMAGE_ERROR, action='push', err=''.join(errors))
-                return docker_log
-        raise CloudError(CloudError.INVALID_OPERATION, ctype=self.cloud.type.name)
+        docker_log = [literal_eval(line.strip()) for line in self._docker_client.images.push(self.name).splitlines() if line]
+        errors = [line['error'] for line in docker_log if 'error' in line]
+        if errors:
+            raise CloudError(CloudError.IMAGE_ERROR, action='push', err=''.join(errors))
+        return docker_log
 
     def run(self, *, detach: bool = True, update: bool = True, **kwargs) -> DockerContainer:
         """Run an image to create an active container.
@@ -289,16 +259,9 @@ class Image:
             CloudError.INVALID_OPERATION: If the cloud type does not support image tagging.
         """
         new_ref: Optional[Image] = None
-        match self.cloud.type:
-            case CloudType.local | CloudType.dockerhub:
-                self.pull()
-                self._ref.tag(new_tag)
-                (new_ref := Image(self.cloud, new_tag)).push()
-            case CloudType.gcloud:
-                self.cloud.exec('container', 'images', 'add-tag', self.name, new_tag, ignore_stderr=True)
-                new_ref = Image(self.cloud, new_tag)
-            case _:
-                raise CloudError(CloudError.INVALID_OPERATION, ctype=self.cloud.type.name)
+        self.pull()
+        self._ref.tag(new_tag)
+        (new_ref := Image(self.cloud, new_tag)).push()
         return new_ref
 
 
