@@ -13,6 +13,11 @@ on:
       - feature/*
       - release/*
 
+permissions:
+  checks: write
+  contents: write
+  id-token: write
+
 jobs:
   ci-cd:
     uses: arisilon/shared-actions/.github/workflows/python-cicd.yaml@main
