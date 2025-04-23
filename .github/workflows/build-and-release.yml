@@ -23,3 +23,4 @@ jobs:
     uses: arisilon/shared-actions/.github/workflows/python-cicd.yaml@main
     with:
       test-action: "python -c 'import batcave; print(batcave.__version__)'"
+    secrets: inherit
