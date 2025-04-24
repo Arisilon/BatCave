@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Changed:
   - Fixed issue with creating an Image instance for an remote registry. (GitHub #128)
+  - Use new CI/CD workflows and actions.
 
 - Removed:
   - Removed support for Google Container Registry. (GitHub #127)
