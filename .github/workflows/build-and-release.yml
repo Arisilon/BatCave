@@ -2,7 +2,7 @@ name: BatCave Build and Release
 
 on:
   workflow_dispatch:
-  inputs:
+    inputs:
       skip-pypi-test:
         type: boolean
   push:
