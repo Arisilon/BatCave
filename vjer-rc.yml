@@ -1,0 +1,11 @@
+schema: 3
+project:
+  name: batcave
+  version_service:
+    type: bumpver
+release:
+  steps:
+    - type: pypi
+      username: __token__
+      password: "{var:PYPI_TOKEN}"
+    - type: bumpver
