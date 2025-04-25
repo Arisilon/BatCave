@@ -2,6 +2,9 @@ name: BatCave Build and Release
 
 on:
   workflow_dispatch:
+  inputs:
+      skip-pypi-test:
+        type: boolean
   push:
     branches:
       - main
@@ -22,6 +25,7 @@ jobs:
   ci-cd:
     uses: arisilon/shared-actions/.github/workflows/python-cicd.yaml@main
     with:
+      skip-pypi-test: ${{ inputs.skip-pypi-test || false }}
       test-action: "python -c 'import batcave; print(batcave.__version__)'"
       vjer-version: 39.0.0rc20
     secrets: inherit
