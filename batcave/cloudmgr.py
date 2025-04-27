@@ -15,6 +15,7 @@ from typing import Any, List, Optional, Sequence
 
 # Import third-party modules
 from docker import DockerClient
+from docker.errors import ImageNotFound
 from docker.models.containers import Container as DockerContainer
 from requests import head as get_head
 
@@ -176,7 +177,10 @@ class Image:
                                 headers={"Accept": "application/vnd.docker.distribution.manifest.v2+json"}, timeout=10)
             if response.status_code != 200:
                 self._ref = None
-        self._ref = self.cloud.client.images.get(self.name)
+        try:
+            self._ref = self.cloud.client.images.get(self.name)
+        except ImageNotFound:
+            self._ref = None
 
     def __enter__(self):
         return self
