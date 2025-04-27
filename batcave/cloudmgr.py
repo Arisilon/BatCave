@@ -11,7 +11,7 @@ from enum import Enum
 from os import getenv
 from pathlib import Path
 from string import Template
-from typing import Any, cast, List, Optional, Sequence
+from typing import Any, List, Optional, Sequence
 
 # Import third-party modules
 from docker import DockerClient
@@ -54,12 +54,11 @@ class CloudError(BatCaveException):
 class Cloud:
     """Class to create a universal abstract interface for a cloud instance."""
 
-    def __init__(self, ctype: CloudType, /, *, auth: str | Sequence[str] = tuple(), login: bool = True):
+    def __init__(self, ctype: CloudType, /, *, auth: Sequence[str] = ('', ''), login: bool = True):
         """
         Args:
             ctype: The cloud provider for this instance. Must be a member of CloudType.
-            auth (optional, default=None): For local or Docker Hub this is a (username, password) tuple.
-                For Google Cloud it is the path to a service account key file.
+            auth (optional, default=None): This is a (username, password) tuple.
             login (optional, default=True): Whether or not to login to the cloud provider at instance initialization.
 
         Attributes:
@@ -69,7 +68,7 @@ class Cloud:
         """
         self._client: Any = False
         self._type = ctype
-        self.auth = auth
+        self.auth = (auth[0], auth[1])
         validate_type(self.type)
         if login:
             self.login()
@@ -173,7 +172,7 @@ class Image:
         self._docker_client: DockerClient = self.cloud.client if isinstance(self.cloud.client, DockerClient) else DockerClient()
         if self._cloud.type == CloudType.dockerhub:
             (image, tag) = self.name.split(':', 1)
-            response = get_head(f'https://registry.hub.docker.com/v2/{image}/manifests/{tag}', auth=cast(tuple, self._cloud.auth),
+            response = get_head(f'https://registry.hub.docker.com/v2/{image}/manifests/{tag}', auth=self._cloud.auth,
                                 headers={"Accept": "application/vnd.docker.distribution.manifest.v2+json"}, timeout=10)
             if response.status_code != 200:
                 self._ref = None
