@@ -27,5 +27,5 @@ jobs:
     with:
       skip-pypi-test: ${{ inputs.skip-pypi-test || false }}
       test-action: "python -c 'import batcave; print(batcave.__version__)'"
-      vjer-version: 39.0.0rc32
+      vjer-version: 39.0.0rc36
     secrets: inherit

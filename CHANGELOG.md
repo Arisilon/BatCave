@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
-### [46.0.0] - 2025-04-27
+### [46.0.0] - 2025-04-30
 
 - Changed:
   - Fixed issue with creating an Image instance for an remote registry. (GitHub #128)
