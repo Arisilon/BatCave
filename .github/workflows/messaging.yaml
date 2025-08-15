@@ -5,7 +5,7 @@ jobs:
   job1:
     runs-on: ubuntu-latest
     steps:
-      - run: echo First job
+      - run: exit 1
   job2:
     runs-on: ubuntu-latest
     steps:
