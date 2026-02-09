@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [46.0.1] - 2026-02-09
+
+- Changed:
+  - Updated dependencies. (GitHub #132)
+
+## Release History
+
 ### [46.0.0] - 2025-04-30
 
 - Changed:
@@ -15,8 +22,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Removed:
   - Removed support for Google Container Registry. (GitHub #127)
-
-## Release History
 
 ### [45.0.2] - 2025-03-18
 

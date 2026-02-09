@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools >= 77.0"]
+requires = ["setuptools >= 82.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -28,12 +28,12 @@ dependencies = [
     "DotMap ~= 1.3",
     "GitPython ~= 3.1",
     "google-api-core",
-    "kubernetes ~= 32.0",
+    "kubernetes ~= 35.0",
     "requests ~= 2.32",
     "PyYAML ~= 6.0",
     "pywin32-stubs; sys_platform == 'win32'",
     "WMI ~= 1.5; sys_platform == 'win32'",
-    "psutil ~= 7.0; platform_machine not in 'armv6l armv7l armv8b armv8l'",
+    "psutil ~= 7.2; platform_machine not in 'armv6l armv7l armv8b armv8l'",
     "PyQt5 ~= 5.15; platform_machine not in 'aarch64 aarch64_be armv6l armv7l armv8b armv8l'",
 ]
 

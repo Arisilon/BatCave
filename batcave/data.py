@@ -251,12 +251,12 @@ class DataSource:
                     else:
                         self._closer = self._connect_info
                     try:
-                        self._connection = xml_etree.parse(cast(bytes, self._closer))
+                        self._connection = cast(ElementTree, xml_etree.parse(cast(bytes, self._closer)))
                     except expat.ExpatError as err:
                         if expat.ErrorString(err.code) == expat.errors.XML_ERROR_SYNTAX:  # pylint: disable=no-member
                             raise DataError(DataError.BAD_URL, url=self._connect_info) from err
                         raise
-                self._source = self._connection.getroot()
+                self._source = cast(ElementTree, self._connection).getroot()
                 if self._source.tag != self.name:
                     raise DataError(DataError.BAD_ROOT, source_name=self._connect_info, root_name=self._source.tag, expected=self.name)
 

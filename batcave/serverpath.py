@@ -119,7 +119,7 @@ class ServerPath:
             return syscmd(remote_cp_command, *remote_cp_args, self.local, sp_dest.remote)
 
         # if you get here it is a file copy from Windows to Windows, just use shutil
-        return copy(self.remote, sp_dest.remote)
+        return str(copy(self.remote, sp_dest.remote))
 
     def exists(self) -> bool:
         """Implementation of pathlib.Path.exists() adding remote server support.

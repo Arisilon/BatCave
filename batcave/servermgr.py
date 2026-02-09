@@ -997,7 +997,7 @@ class Service(ManagementObject):
             case _:
                 raise ServerObjectManagementError(ServerObjectManagementError.BAD_OBJECT_SIGNAL, signal=signal.name)
 
-        control_method = final_state = ''
+        control_method = ''
         if not ignore_state:
             wait_for = self.ServiceState.Running
             match self.state:
