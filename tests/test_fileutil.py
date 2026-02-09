@@ -68,6 +68,7 @@ class TestPrune(TestCase):
             item.chmod(S_IREAD)
         self._tempdir.chmod(S_IREAD)
         # self.assertRaises(PermissionError, lambda: self._prune(age=2))
+        self._prune(age=2)
         self.assertEqual(self._full_file_list, self._file_list)
         self._prune(age=2, force=True)
         self.assertEqual(self._full_file_list[:-4], self._file_list)
