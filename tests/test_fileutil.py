@@ -15,7 +15,6 @@ from batcave.fileutil import prune
 from batcave.sysutil import rmtree_hard
 
 
-
 class TestPrune(TestCase):
     @property
     def _file_list(self):
