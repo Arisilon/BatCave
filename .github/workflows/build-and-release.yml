@@ -20,7 +20,6 @@ permissions:
   checks: write
   contents: write
   id-token: write
-  issues: write
 
 jobs:
   ci-cd:
@@ -29,4 +28,3 @@ jobs:
       skip-pypi-test: ${{ inputs.skip-pypi-test || false }}
       test-action: "python -c 'import batcave; print(batcave.__version__)'"
     secrets: inherit
-
