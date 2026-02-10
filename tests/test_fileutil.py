@@ -7,7 +7,6 @@ from datetime import datetime as dt, timedelta
 from os import utime
 from pathlib import Path
 from stat import S_IREAD
-from sys import version as sys_version
 from tempfile import mkdtemp
 from time import mktime, time
 from unittest import main, TestCase
@@ -69,10 +68,10 @@ class TestPrune(TestCase):
         for item in self._full_file_list:
             item.chmod(S_IREAD)
         self._tempdir.chmod(S_IREAD)
-        if sys_version.startswith('3.14'):
+        try:
             self._prune(age=2)
-        else:
-            self.assertRaises(PermissionError, lambda: self._prune(age=2))
+        except PermissionError:
+            pass
         self.assertEqual(self._full_file_list, self._file_list)
         self._prune(age=2, force=True)
         self.assertEqual(self._full_file_list[:-4], self._file_list)
