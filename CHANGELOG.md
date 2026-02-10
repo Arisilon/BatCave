@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
-### [46.0.1] - 2026-02-09
+### [46.0.1] - 2026-02-10
 
 - Changed:
   - Updated dependencies. (GitHub #132)
