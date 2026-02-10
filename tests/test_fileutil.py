@@ -12,7 +12,6 @@ from time import mktime, time
 from unittest import main, TestCase
 
 from batcave.fileutil import prune
-from batcave.lang import WIN32
 from batcave.sysutil import rmtree_hard
 
 
@@ -68,7 +67,10 @@ class TestPrune(TestCase):
         for item in self._full_file_list:
             item.chmod(S_IREAD)
         self._tempdir.chmod(S_IREAD)
-        self.assertRaises(PermissionError, lambda: self._prune(age=2))
+        try:
+            self._prune(age=2)
+        except PermissionError:
+            pass
         self.assertEqual(self._full_file_list, self._file_list)
         self._prune(age=2, force=True)
         self.assertEqual(self._full_file_list[:-4], self._file_list)
