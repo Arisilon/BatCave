@@ -7,12 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [47.1.0] - 2026-02-13
+
+- Added:
+  - Added the active_branch property to cms.Client. (GitHub #135)
+
+## Release History
+
 ### [47.0.0] - 2026-02-12
 
 - Changed:
   - Change default cms.Client branch to the repo default. (GitHub #134)
-
-## Release History
 
 ### [46.0.1] - 2026-02-10
 

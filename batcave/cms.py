@@ -553,6 +553,17 @@ class Client:
     type = property(lambda s: s._type, doc='A read-only property which returns the CMS type.')
 
     @property
+    def active_branch(self) -> str:
+        """A read-only property which returns the current active branch name."""
+        match self._type:
+            case ClientType.git:
+                return str(self._client.active_branch)
+            case ClientType.perforce:
+                client_spec = self._p4fetch('client')
+                return client_spec.get('Stream', '')
+        raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
+
+    @property
     def branches(self) -> Any:
         """A read-only property which returns the client branch list."""
         match self._type:
@@ -1219,7 +1230,7 @@ class Client:
                 branch_owner: str = self._client.heads if (f'refs/heads/{source_branch}' in [str(b) for b in self.branches]) else self._client.remotes.origin.refs
                 result: List[str] = self._client.git.merge(getattr(branch_owner, source_branch), '--no-ff')
                 if checkin:
-                    final_message: str = checkin_message if (checkin_message is not None) else f'Merging code from {source_branch} to {self._client.active_branch}'
+                    final_message: str = checkin_message if (checkin_message is not None) else f'Merging code from {source_branch} to {self.active_branch}'
                     self.checkin_files(final_message, all_branches=True, no_execute=no_execute)
                 return result
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
