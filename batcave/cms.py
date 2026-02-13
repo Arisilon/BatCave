@@ -426,7 +426,10 @@ class Client:
                     git_args['branch'] = branch
                 if info:
                     git_args['depth'] = 1
-                self._client = GitRepo.clone_from(self._connect_info, client_root, branch=(branch if branch else 'master')) if create_client else GitRepo(self._connect_info)
+                clone_kwargs: Dict[str, Any] = {}
+                if branch:
+                    clone_kwargs['branch'] = branch
+                self._client = GitRepo.clone_from(self._connect_info, client_root, **clone_kwargs) if create_client else GitRepo(self._connect_info)
                 self._connected = True
             case ClientType.perforce:
                 self._client = self._p4run(P4.P4)
