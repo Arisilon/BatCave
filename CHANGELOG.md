@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - Added delete_branch method to cms.Client.
     - Added remote_branch argument to cms.Client.create_branch.
     - Added rebase argument to cms.Client.update.
+    - Added reset option to cms.Client.switch.
   - Added missing sysutil tests.
 
 - Changed:

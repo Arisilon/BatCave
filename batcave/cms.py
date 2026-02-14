@@ -1387,11 +1387,12 @@ class Client:
                 return []
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
-    def switch(self, branch: str, /) -> List[str]:
+    def switch(self, branch: str, /, reset: bool = False) -> List[str]:
         """Switch to the specified branch.
 
         Args:
             branch: The branch to which to switch.
+            reset (optional, default=False): If True, reset the branch to the remote state.
 
         Returns:
             The result of the switch command.
@@ -1401,6 +1402,8 @@ class Client:
         """
         match self._type:
             case ClientType.git:
+                if reset:
+                    return self._client.git.reset(branch)
                 self._client.git.fetch('--all')
                 if branch not in {b.name.removeprefix('origin/') for b in self.branches}:
                     self.create_branch(branch)
