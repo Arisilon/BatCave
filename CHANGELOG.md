@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - Added sysutil functions get_app_data_dir and get_app_config_dir.
     - Added active_branch property to cms.Client.
     - Added delete_branch method to cms.Client.
+    - Allow setting remote on branch creation.
   - Added missing sysutil tests.
 
 - Changed:

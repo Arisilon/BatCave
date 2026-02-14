@@ -831,8 +831,8 @@ class Client:
             self._p4run('disconnect')
             self._connected = False
 
-    def create_branch(self, name: str, /, *, branch_from: str = '', repo: str = '',
-                      branch_type: str = '', options: Optional[Dict[str, str]] = None, no_execute: bool = False) -> List[str]:
+    def create_branch(self, name: str, /, *, branch_from: str = '', repo: str = '', branch_type: str = '', remote_branch: str = '',
+                      options: Optional[Dict[str, str]] = None, no_execute: bool = False) -> List[str]:
         """Create the specified branch.
 
         Args:
@@ -869,8 +869,9 @@ class Client:
                 args: List[str] = [name]
                 if branch_from:
                     args.append(branch_from)
-                self._client.create_head(*args)
-                getattr(self._client.heads, name).checkout()
+                if remote_branch:
+                    args += ['--track', remote_branch]
+                self._client.git.checkout('-b', name, *args)
                 if no_execute:
                     return []
                 return self._client.git.push('origin', name, set_upstream=True)
