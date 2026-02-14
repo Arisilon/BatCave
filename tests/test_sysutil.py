@@ -49,7 +49,7 @@ class TestLockFile(TestCase):
             pass
         self.assertTrue(self._fn.exists())
 
-    @skip('Problems with secondary process')
+    # @skip('Problems with secondary process')
     def test_3_lock(self):
         with LockFile(self._fn, handle=self._fh, cleanup=True):
             self._lock_again.start()
@@ -57,7 +57,7 @@ class TestLockFile(TestCase):
             self._lock_again.join()
             self.assertTrue(got_lock == LockSignal.false)
 
-    @skip('Problems with secondary process')
+    # @skip('Problems with secondary process')
     def test_4_unlock(self):
         with LockFile(self._fn, handle=self._fh, cleanup=True) as lockfile:
             lockfile.action(LockMode.unlock)
