@@ -721,7 +721,7 @@ class Client:
                     return self._client.create_remote(name, url)
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
-    def checkin_files(self, description: str, /, *files: str, all_branches: bool = False, remote: str = 'origin',
+    def checkin_files(self, description: str, /, *files: str, all_branches: bool = False, remote: Optional[str] = 'origin',
                       fail_on_empty: bool = False, no_execute: bool = False, **extra_args) -> List[str]:
         """Commit open files on the client.
 
@@ -747,6 +747,8 @@ class Client:
                 return []
             case ClientType.git:
                 if not no_execute:
+                    if remote is None:
+                        return self._client.git.commit('-a', '-m', description)
                     self._client.index.commit(description)
                     args: Dict[str, bool] = ({'set_upstream': True, 'all': True} if all_branches else {}) | extra_args
                     progress = git_remote_progress()

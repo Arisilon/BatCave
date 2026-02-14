@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - Added rebase argument to cms.Client.update.
     - Added reset option to cms.Client.switch.
     - Added all_files option to cms.Client.add_files.
+    - Allow remote to be None on cms.Client.checkin_files to inhibit gt push.
   - Added missing sysutil tests.
 
 - Changed:
@@ -1578,4 +1579,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!--- cSpell:ignore docstrings platarch cmds psutil servermgr pywin sqlscript verfiles cloudmgr qbpy pkgtype unittest recopytree pathlib pypiwin
       cSpell:ignore pythonval fileutil cmsclient civars chmodtree sysutl cmdspec webapp virtualwrapper configmgr buildname vsver hasapp useshell
       cSpell:ignore GNUC envcfg pipenv statemachine psexec getattr contextlib logname xmltodict ignorestderr USERPROFILE netutil assemblyinfo
-      cSpell:ignore setattr iispy virtualenv prdb syscmd splitlines dataclasses pylance removeprefix dotmap bumpver oicd vjer -->
+      cSpell:ignore setattr iispy virtualenv prdb syscmd splitlines dataclasses pylance removeprefix dotmap bumpver oicd vjer checkin -->
