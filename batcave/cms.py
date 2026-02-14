@@ -643,11 +643,12 @@ class Client:
                 return self._p4run('have')
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
-    def add_files(self, *files: PathName, no_execute: bool = False) -> List[str]:
+    def add_files(self, *files: PathName, all_files: bool = False, no_execute: bool = False) -> List[str]:
         """Add files to the client.
 
         Args:
             *files: The files to add.
+            all_files (optional, default=False): If True, add all files.
             no_execute (optional, default=False): If True, run the command but don't commit the results.
 
         Returns:
@@ -661,6 +662,8 @@ class Client:
                 pass
             case ClientType.git:
                 if not no_execute:
+                    if all_files:
+                        return self._client.git.add('--all')
                     return self._client.index.add([str(f) for f in files])
             case ClientType.perforce:
                 args: List[str] = ['-n'] if no_execute else []

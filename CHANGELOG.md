@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - Added remote_branch argument to cms.Client.create_branch.
     - Added rebase argument to cms.Client.update.
     - Added reset option to cms.Client.switch.
+    - Added all_files option to cms.Client.add_files.
   - Added missing sysutil tests.
 
 - Changed:
