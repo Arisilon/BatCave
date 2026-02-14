@@ -876,6 +876,26 @@ class Client:
                 return self._client.git.push('origin', name, set_upstream=True)
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
+    def delete_branch(self, name: str, /, *, no_execute: bool = False) -> List[str]:
+        """Delete the specified branch.
+
+        Args:
+            name: The name of the branch to delete.
+            no_execute (optional, default=False): If True, run the command but don't revert the files.
+
+        Returns:
+            The result of the branch delete command.
+
+        Raises:
+            CMSError.INVALID_OPERATION: If the client CMS type is not supported.
+        """
+        match self._type:
+            case ClientType.git:
+                if no_execute:
+                    return []
+                return self._client.git.push('origin', '--delete', name)
+        raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
+
     def create_repo(self, repository: str, /, *, repo_type: Optional[str] = None, no_execute: bool = False) -> List[str]:
         """Create the specified repository.
 
