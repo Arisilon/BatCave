@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - GitHub #135:
     - Added sysutil functions get_app_data_dir and get_app_config_dir.
     - Added the active_branch property to cms.Client.
+  - Added missing sysutil tests.
+
+- Changed:
+  - Fixed bug in flatten where strings were being iterated.
 
 ## Release History
 
