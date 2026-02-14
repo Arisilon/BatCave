@@ -1465,7 +1465,8 @@ class Client:
                 return self._p4run('unedit', *args)
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
-    def update(self, *files: str, limiters: Optional[str] = None, force: bool = False, parallel: bool = False, no_execute: bool = False) -> List[str]:
+    def update(self, *files: str, limiters: Optional[str] = None, force: bool = False,
+               parallel: bool = False, rebase: Optional[str] = None, no_execute: bool = False) -> List[str]:
         """Update the local client files.
 
         Args:
@@ -1473,6 +1474,7 @@ class Client:
             limiters (optional, default=None): Arguments to limit the updated files.
             force (optional, default=False): If True update files that are already up-to-date.
             parallel (optional, default=False): If True update files in parallel.
+            rebase (optional, default=None): If not None, rebase the changes onto the specified branch.
             no_execute (optional, default=False): If True, run the command but don't commit the results.
 
         Returns:
@@ -1485,6 +1487,8 @@ class Client:
             case ClientType.file:
                 pass
             case ClientType.git:
+                if rebase:
+                    return self._client.git.pull('--rebase', 'origin', rebase)
                 info = self._client.remotes.origin.pull()[0]
                 return info.note if info.note else info.ref
             case ClientType.perforce:
