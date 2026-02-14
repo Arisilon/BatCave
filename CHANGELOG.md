@@ -16,9 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - Added delete_branch method to cms.Client.
     - Added remote_branch argument to cms.Client.create_branch.
     - Added rebase argument to cms.Client.update.
-    - Added reset option to cms.Client.switch.
-    - Added all_files option to cms.Client.add_files.
-    - Allow remote to be None on cms.Client.checkin_files to inhibit gt push.
+    - Added reset argument to cms.Client.switch.
+    - Added all_files argument to cms.Client.add_files.
+    - Added all_files and remote_ref arguments to cms.Client.checkin_files to inhibit gt push.
   - Added missing sysutil tests.
 
 - Changed:

@@ -721,14 +721,17 @@ class Client:
                     return self._client.create_remote(name, url)
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
-    def checkin_files(self, description: str, /, *files: str, all_branches: bool = False, remote: Optional[str] = 'origin',
-                      fail_on_empty: bool = False, no_execute: bool = False, **extra_args) -> List[str]:
+    def checkin_files(self, description: str, /, *files: str, all_branches: bool = False, all_files: bool = False, remote: str = 'origin',
+                      remote_ref: Optional[str] = None, fail_on_empty: bool = False, no_execute: bool = False, **extra_args) -> List[str]:
         """Commit open files on the client.
 
         Args:
             description: A description of the changes.
             *files (optional): If provided, a subset of the files to commit, otherwise all will be submitted.
             all_branches (optional, default=False): If True, commit all branches, otherwise only the current branch.
+            all_files (optional, default=False): If True, commit all files, otherwise only the specified files.
+            remote (optional, default='origin'): The remote to which to push the changes for git clients.
+            remote_ref (optional, default=None): The remote ref to which to push the changes for git clients. If not provided, the default remote ref will be used.
             fail_on_empty (optional, default=False): If True, raise an error if there are no files to commit, otherwise just return.
             no_execute (optional, default=False): If True, run the command but don't commit the results.
             **extra_args (optional): Any extra API specific arguments or the commit.
@@ -747,9 +750,13 @@ class Client:
                 return []
             case ClientType.git:
                 if not no_execute:
-                    if remote is None:
-                        return self._client.git.commit('-a', '-m', description)
-                    self._client.index.commit(description)
+                    if all_files:
+                        self._client.git.commit('-a', '-m', description)
+                    else:
+                        self._client.index.commit(description)
+                    if remote_ref:
+                        return self._client.git.push(remote, remote_ref)
+
                     args: Dict[str, bool] = ({'set_upstream': True, 'all': True} if all_branches else {}) | extra_args
                     progress = git_remote_progress()
                     result = getattr(self._client.remotes, remote).push(progress=progress, **args)
