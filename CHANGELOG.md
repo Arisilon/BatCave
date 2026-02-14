@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - Added reset argument to cms.Client.switch.
     - Added all_files argument to cms.Client.add_files.
     - Added all_files and remote_ref arguments to cms.Client.checkin_files to inhibit gt push.
+    - Added set_remote method to cms.Client.
   - Added missing sysutil tests.
 
 - Changed:

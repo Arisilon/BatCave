@@ -1399,6 +1399,24 @@ class Client:
                 return []
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
+    def set_remote(self, branch: str, /, name: str = 'origin') -> List[str]:
+        """Set the remote for the specified branch.
+
+        Args:
+            branch: The branch for which to set the remote.
+            name (optional, default='origin'): The name of the remote.
+
+        Returns:
+            The result of the set remote command.
+
+        Raises:
+            CMSError.INVALID_OPERATION: If the client CMS type is not supported.
+        """
+        match self._type:
+            case ClientType.git:
+                return self._client.git.branch('--set-upstream-to', f'{name}/{branch}')
+        raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
+
     def switch(self, branch: str, /, reset: bool = False) -> List[str]:
         """Switch to the specified branch.
 
