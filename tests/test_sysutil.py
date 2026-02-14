@@ -10,7 +10,9 @@ from pathlib import Path
 from tempfile import mkdtemp, mkstemp
 from unittest import main, skip, TestCase
 
-from batcave.sysutil import pushd, popd, CMDError, LockFile, LockError, LockMode
+from unittest.mock import patch
+
+from batcave.sysutil import pushd, popd, CMDError, get_app_config_dir, get_app_data_dir, LockFile, LockError, LockMode
 
 LockSignal = Enum('LockSignal', ('true', 'false'))
 
@@ -94,6 +96,72 @@ class TestDirStack(TestCase):
         new_dir = Path.cwd()
         self.assertEqual(old_dir, start)
         self.assertEqual(new_dir, start)
+
+
+class TestAppDirs(TestCase):
+    APP_NAME = 'TestBatCaveApp'
+
+    @patch('batcave.sysutil.sys')
+    def test_data_dir_windows(self, mock_sys):
+        mock_sys.platform = 'win32'
+        with patch('batcave.sysutil.getenv', return_value='C:\\Users\\test\\AppData\\Local'):
+            result = get_app_data_dir(self.APP_NAME)
+        self.assertEqual(result, Path('C:\\Users\\test\\AppData\\Local') / self.APP_NAME)
+
+    @patch('batcave.sysutil.sys')
+    def test_data_dir_darwin(self, mock_sys):
+        mock_sys.platform = 'darwin'
+        result = get_app_data_dir(self.APP_NAME)
+        self.assertEqual(result, Path.home() / 'Library' / 'Application Support' / self.APP_NAME)
+
+    @patch('batcave.sysutil.sys')
+    def test_data_dir_linux_default(self, mock_sys):
+        mock_sys.platform = 'linux'
+        with patch('batcave.sysutil.getenv', side_effect=lambda key, default=None: default):
+            result = get_app_data_dir(self.APP_NAME)
+        self.assertEqual(result, Path.home() / '.local' / 'share' / self.APP_NAME)
+
+    @patch('batcave.sysutil.sys')
+    def test_data_dir_linux_xdg(self, mock_sys):
+        mock_sys.platform = 'linux'
+        with patch('batcave.sysutil.getenv', return_value='/custom/data'):
+            result = get_app_data_dir(self.APP_NAME)
+        self.assertEqual(result, Path('/custom/data') / self.APP_NAME)
+
+    @patch('batcave.sysutil.sys')
+    def test_config_dir_windows(self, mock_sys):
+        mock_sys.platform = 'win32'
+        with patch('batcave.sysutil.getenv', return_value='C:\\Users\\test\\AppData\\Roaming'):
+            result = get_app_config_dir(self.APP_NAME)
+        self.assertEqual(result, Path('C:\\Users\\test\\AppData\\Roaming') / self.APP_NAME)
+
+    @patch('batcave.sysutil.sys')
+    def test_config_dir_darwin(self, mock_sys):
+        mock_sys.platform = 'darwin'
+        result = get_app_config_dir(self.APP_NAME)
+        self.assertEqual(result, Path.home() / 'Library' / 'Preferences' / self.APP_NAME)
+
+    @patch('batcave.sysutil.sys')
+    def test_config_dir_linux_default(self, mock_sys):
+        mock_sys.platform = 'linux'
+        with patch('batcave.sysutil.getenv', side_effect=lambda key, default=None: default):
+            result = get_app_config_dir(self.APP_NAME)
+        self.assertEqual(result, Path.home() / '.config' / self.APP_NAME)
+
+    @patch('batcave.sysutil.sys')
+    def test_config_dir_linux_xdg(self, mock_sys):
+        mock_sys.platform = 'linux'
+        with patch('batcave.sysutil.getenv', return_value='/custom/config'):
+            result = get_app_config_dir(self.APP_NAME)
+        self.assertEqual(result, Path('/custom/config') / self.APP_NAME)
+
+    def test_return_type(self):
+        self.assertIsInstance(get_app_data_dir(self.APP_NAME), Path)
+        self.assertIsInstance(get_app_config_dir(self.APP_NAME), Path)
+
+    def test_app_name_is_last_component(self):
+        self.assertEqual(get_app_data_dir(self.APP_NAME).name, self.APP_NAME)
+        self.assertEqual(get_app_config_dir(self.APP_NAME).name, self.APP_NAME)
 
 
 if __name__ == '__main__':

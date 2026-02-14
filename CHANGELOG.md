@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### [47.1.0] - 2026-02-13
 
 - Added:
-  - Added the active_branch property to cms.Client. (GitHub #135)
+  - GitHub #135:
+    - Added sysutil functions get_app_data_dir and get_app_config_dir.
+    - Added the active_branch property to cms.Client.
 
 ## Release History
 
