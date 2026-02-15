@@ -5,14 +5,122 @@
 
 from enum import Enum
 from multiprocessing import Process, Queue
-from os import fdopen
+from os import fdopen, getenv
 from pathlib import Path
+from stat import S_IRGRP, S_IROTH, S_IRUSR
+from sys import platform
 from tempfile import mkdtemp, mkstemp
-from unittest import main, skip, TestCase
+from unittest import main, TestCase
 
-from batcave.sysutil import pushd, popd, CMDError, LockFile, LockError, LockMode
+from batcave.sysutil import (chmod, CMDError, get_app_config_dir, get_app_data_dir,
+                             LockError, LockFile, LockMode, OSUtilError,
+                             popd, pushd, rmpath, rmtree_hard, syscmd, SysCmdRunner)
 
 LockSignal = Enum('LockSignal', ('true', 'false'))
+
+
+class TestAppDirs(TestCase):
+    APP_NAME = 'TestBatCaveApp'
+
+    def test_data_dir_return_type(self):
+        self.assertIsInstance(get_app_data_dir(self.APP_NAME), Path)
+
+    def test_config_dir_return_type(self):
+        self.assertIsInstance(get_app_config_dir(self.APP_NAME), Path)
+
+    def test_data_dir_app_name(self):
+        self.assertEqual(get_app_data_dir(self.APP_NAME).name, self.APP_NAME)
+
+    def test_config_dir_app_name(self):
+        self.assertEqual(get_app_config_dir(self.APP_NAME).name, self.APP_NAME)
+
+    def test_data_dir_platform_path(self):
+        match platform:
+            case 'win32':
+                expected = Path(getenv('LOCALAPPDATA', ''), self.APP_NAME)
+            case 'darwin':
+                expected = Path.home() / 'Library/Application Support' / self.APP_NAME
+            case _:
+                expected = Path(getenv('XDG_DATA_HOME', Path.home() / '.local/share'), self.APP_NAME)
+        self.assertEqual(get_app_data_dir(self.APP_NAME), expected)
+
+    def test_config_dir_platform_path(self):
+        match platform:
+            case 'win32':
+                expected = Path(getenv('APPDATA', ''), self.APP_NAME)
+            case 'darwin':
+                expected = Path.home() / 'Library/Preferences' / self.APP_NAME
+            case _:
+                expected = Path(getenv('XDG_CONFIG_HOME', Path.home() / '.config'), self.APP_NAME)
+        self.assertEqual(get_app_config_dir(self.APP_NAME), expected)
+
+
+class TestChmod(TestCase):
+    def test_chmod_directory(self):
+        tempdir = Path(mkdtemp())
+        try:
+            chmod(tempdir, S_IRUSR | S_IRGRP | S_IROTH)
+            mode = tempdir.stat().st_mode
+            match platform:
+                case 'win32':
+                    pass  # Windows chmod is limited
+                case _:
+                    self.assertTrue(mode & S_IRUSR)
+        finally:
+            tempdir.chmod(0o700)
+            tempdir.rmdir()
+
+    def test_chmod_recursive(self):
+        tempdir = Path(mkdtemp())
+        subdir = tempdir / 'sub'
+        subdir.mkdir()
+        testfile = subdir / 'file.txt'
+        testfile.write_text('test')
+        try:
+            chmod(tempdir, 0o755, recursive=True)
+            match platform:
+                case 'win32':
+                    pass  # Windows chmod is limited
+                case _:
+                    self.assertTrue(subdir.stat().st_mode & S_IRUSR)
+                    self.assertTrue(testfile.stat().st_mode & S_IRUSR)
+        finally:
+            rmtree_hard(tempdir)
+
+    def test_chmod_files_only(self):
+        tempdir = Path(mkdtemp())
+        testfile = tempdir / 'file.txt'
+        testfile.write_text('test')
+        try:
+            original_dir_mode = tempdir.stat().st_mode
+            chmod(tempdir, 0o644, recursive=True, files_only=True)
+            self.assertEqual(tempdir.stat().st_mode, original_dir_mode)
+        finally:
+            rmtree_hard(tempdir)
+
+
+class TestDirStack(TestCase):
+    def setUp(self):
+        self._tempdir = Path(mkdtemp()).resolve()
+
+    def tearDown(self):
+        self._tempdir.rmdir()
+
+    def test_popd_empty_stack(self):
+        self.assertEqual(popd(), 0)
+
+    def test_push_and_pop(self):
+        start = Path.cwd()
+
+        old_dir = pushd(self._tempdir)
+        new_dir = Path.cwd()
+        self.assertEqual(old_dir, start)
+        self.assertEqual(new_dir, self._tempdir)
+
+        old_dir = popd()
+        new_dir = Path.cwd()
+        self.assertEqual(old_dir, start)
+        self.assertEqual(new_dir, start)
 
 
 class TestExceptions(TestCase):
@@ -47,7 +155,6 @@ class TestLockFile(TestCase):
             pass
         self.assertTrue(self._fn.exists())
 
-    @skip('Problems with secondary process')
     def test_3_lock(self):
         with LockFile(self._fn, handle=self._fh, cleanup=True):
             self._lock_again.start()
@@ -55,7 +162,6 @@ class TestLockFile(TestCase):
             self._lock_again.join()
             self.assertTrue(got_lock == LockSignal.false)
 
-    @skip('Problems with secondary process')
     def test_4_unlock(self):
         with LockFile(self._fn, handle=self._fh, cleanup=True) as lockfile:
             lockfile.action(LockMode.unlock)
@@ -75,28 +181,108 @@ def secondary_lock_process(filename, queue):
         queue.put(LockSignal.false)
 
 
-class TestDirStack(TestCase):
-    def setUp(self):
-        self._tempdir = Path(mkdtemp()).resolve()
+class TestOSUtilError(TestCase):
+    def test_group_exists(self):
+        try:
+            raise OSUtilError(OSUtilError.GROUP_EXISTS, group='test_group')
+        except OSUtilError as err:
+            self.assertEqual(OSUtilError.GROUP_EXISTS.code, err.code)
 
-    def tearDown(self):
-        self._tempdir.rmdir()
+    def test_invalid_operation(self):
+        try:
+            raise OSUtilError(OSUtilError.INVALID_OPERATION, platform='bad-platform')
+        except OSUtilError as err:
+            self.assertEqual(OSUtilError.INVALID_OPERATION.code, err.code)
 
-    def test_push_and_pop(self):
-        start = Path.cwd()
+    def test_user_exists(self):
+        try:
+            raise OSUtilError(OSUtilError.USER_EXISTS, user='testuser')
+        except OSUtilError as err:
+            self.assertEqual(OSUtilError.USER_EXISTS.code, err.code)
 
-        old_dir = pushd(self._tempdir)
-        new_dir = Path.cwd()
-        self.assertEqual(old_dir, start)
-        self.assertEqual(new_dir, self._tempdir)
 
-        old_dir = popd()
-        new_dir = Path.cwd()
-        self.assertEqual(old_dir, start)
-        self.assertEqual(new_dir, start)
+class TestRmPath(TestCase):
+    def test_remove_file(self):
+        (fd, fn) = mkstemp()
+        fdopen(fd).close()
+        path = Path(fn)
+        self.assertTrue(path.exists())
+        rmpath(path)
+        self.assertFalse(path.exists())
+
+    def test_remove_directory(self):
+        tempdir = Path(mkdtemp())
+        self.assertTrue(tempdir.exists())
+        rmpath(tempdir)
+        self.assertFalse(tempdir.exists())
+
+    def test_remove_directory_with_contents(self):
+        tempdir = Path(mkdtemp())
+        (tempdir / 'subdir').mkdir()
+        (tempdir / 'subdir' / 'file.txt').write_text('test')
+        (tempdir / 'file.txt').write_text('test')
+        rmpath(tempdir)
+        self.assertFalse(tempdir.exists())
+
+
+class TestRmtreeHard(TestCase):
+    def test_remove_tree(self):
+        tempdir = Path(mkdtemp())
+        (tempdir / 'subdir').mkdir()
+        (tempdir / 'subdir' / 'file.txt').write_text('test')
+        rmtree_hard(tempdir)
+        self.assertFalse(tempdir.exists())
+
+    def test_remove_readonly_tree(self):
+        tempdir = Path(mkdtemp())
+        readonly_file = tempdir / 'readonly.txt'
+        readonly_file.write_text('test')
+        readonly_file.chmod(S_IRUSR | S_IRGRP | S_IROTH)
+        rmtree_hard(tempdir)
+        self.assertFalse(tempdir.exists())
+
+
+class TestSysCmd(TestCase):
+    def test_basic_command(self):
+        match platform:
+            case 'win32':
+                result = syscmd('cmd', '/c', 'echo', 'hello')
+            case _:
+                result = syscmd('echo', 'hello')
+        self.assertTrue(any('hello' in line for line in result))
+
+    def test_flatten_output(self):
+        match platform:
+            case 'win32':
+                result = syscmd('cmd', '/c', 'echo', 'hello', flatten_output=True)
+            case _:
+                result = syscmd('echo', 'hello', flatten_output=True)
+        self.assertIsInstance(result, str)
+        self.assertIn('hello', result)
+
+    def test_cmd_not_found(self):
+        with self.assertRaises((CMDError, FileNotFoundError)):
+            syscmd('this_command_does_not_exist_batcave')
+
+    def test_remote_options_without_remote(self):
+        with self.assertRaises(CMDError) as context:
+            syscmd('echo', 'hello', remote_auth=('user', 'pass'))
+        self.assertEqual(CMDError.INVALID_OPERATION.code, context.exception.code)
+
+
+class TestSysCmdRunner(TestCase):
+    def test_basic_run(self):
+        match platform:
+            case 'win32':
+                runner = SysCmdRunner('cmd', '/c', 'echo', show_cmd=False, show_stdout=False)
+                result = runner.run('hello')
+            case _:
+                runner = SysCmdRunner('echo', show_cmd=False, show_stdout=False)
+                result = runner.run('hello')
+        self.assertTrue(any('hello' in line for line in result))
 
 
 if __name__ == '__main__':
     main()
 
-# cSpell:ignore batcave
+# cSpell:ignore batcave localappdata syscmd
