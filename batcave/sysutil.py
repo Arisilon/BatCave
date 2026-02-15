@@ -310,6 +310,52 @@ def create_user(username: str, /, groups: Tuple = tuple(), *, exists_ok: bool = 
         syscmd('useradd', username, '-g', username, *groups_args)
 
 
+def get_app_data_dir(app_name: str, /) -> Path:
+    """Return the platform-appropriate application data directory.
+
+    The returned path follows OS conventions:
+        Windows: %LOCALAPPDATA%/app_name
+        macOS: ~/Library/Application Support/app_name
+        Linux/other: $XDG_DATA_HOME/app_name (defaults to ~/.local/share/app_name)
+
+    Args:
+        app_name: The application name used as the directory name.
+
+    Returns:
+        The Path to the application data directory.
+    """
+    if sys.platform == 'win32':
+        base = Path(getenv('LOCALAPPDATA', ''))
+    elif sys.platform == 'darwin':
+        base = Path.home() / 'Library/Application Support'
+    else:
+        base = Path(getenv('XDG_DATA_HOME', Path.home() / '.local/share'))
+    return base / app_name
+
+
+def get_app_config_dir(app_name: str, /) -> Path:
+    """Return the platform-appropriate application configuration directory.
+
+    The returned path follows OS conventions:
+        Windows: %APPDATA%/app_name
+        macOS: ~/Library/Preferences/app_name
+        Linux/other: $XDG_CONFIG_HOME/app_name (defaults to ~/.config/app_name)
+
+    Args:
+        app_name: The application name used as the directory name.
+
+    Returns:
+        The Path to the application configuration directory.
+    """
+    if sys.platform == 'win32':
+        base = Path(getenv('APPDATA', ''))
+    elif sys.platform == 'darwin':
+        base = Path.home() / 'Library' / 'Preferences'
+    else:
+        base = Path(getenv('XDG_CONFIG_HOME', Path.home() / '.config'))
+    return base / app_name
+
+
 def is_user_administrator() -> bool:
     """Determines if the current user is an OS administrator.
 

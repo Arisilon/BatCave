@@ -10,7 +10,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### [47.1.0] - 2026-02-13
 
 - Added:
-  - Added the active_branch property to cms.Client. (GitHub #135)
+  - GitHub #135:
+    - Added sysutil functions get_app_data_dir and get_app_config_dir.
+    - Added active_branch property to cms.Client.
+    - Added delete_branch method to cms.Client.
+    - Added remote_branch argument to cms.Client.create_branch.
+    - Added rebase argument to cms.Client.update.
+    - Added reset argument to cms.Client.switch.
+    - Added all_files argument to cms.Client.add_files.
+    - Added all_files and remote_ref arguments to cms.Client.checkin_files.
+    - Added set_remote method to cms.Client.
+  - Added missing sysutil tests.
+
+- Changed:
+  - Fixed bug in flatten where strings were being iterated.
 
 ## Release History
 

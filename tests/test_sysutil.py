@@ -15,6 +15,110 @@ from batcave.sysutil import pushd, popd, CMDError, LockFile, LockError, LockMode
 LockSignal = Enum('LockSignal', ('true', 'false'))
 
 
+class TestAppDirs(TestCase):
+    APP_NAME = 'TestBatCaveApp'
+
+    def test_data_dir_return_type(self):
+        self.assertIsInstance(get_app_data_dir(self.APP_NAME), Path)
+
+    def test_config_dir_return_type(self):
+        self.assertIsInstance(get_app_config_dir(self.APP_NAME), Path)
+
+    def test_data_dir_app_name(self):
+        self.assertEqual(get_app_data_dir(self.APP_NAME).name, self.APP_NAME)
+
+    def test_config_dir_app_name(self):
+        self.assertEqual(get_app_config_dir(self.APP_NAME).name, self.APP_NAME)
+
+    def test_data_dir_platform_path(self):
+        match platform:
+            case 'win32':
+                expected = Path(getenv('LOCALAPPDATA', '')) / self.APP_NAME
+            case 'darwin':
+                expected = Path.home() / 'Library/Application Support' / self.APP_NAME
+            case _:
+                expected = Path(getenv('XDG_DATA_HOME', Path.home() / '.local/share')) / self.APP_NAME
+        self.assertEqual(get_app_data_dir(self.APP_NAME), expected)
+
+    def test_config_dir_platform_path(self):
+        match platform:
+            case 'win32':
+                expected = Path(getenv('APPDATA', '')) / self.APP_NAME
+            case 'darwin':
+                expected = Path.home() / 'Library/Preferences' / self.APP_NAME
+            case _:
+                expected = Path(getenv('XDG_CONFIG_HOME', Path.home() / '.config')) / self.APP_NAME
+        self.assertEqual(get_app_config_dir(self.APP_NAME), expected)
+
+
+class TestChmod(TestCase):
+    def test_chmod_directory(self):
+        tempdir = Path(mkdtemp())
+        try:
+            chmod(tempdir, S_IRUSR | S_IRGRP | S_IROTH)
+            mode = tempdir.stat().st_mode
+            match platform:
+                case 'win32':
+                    pass  # Windows chmod is limited
+                case _:
+                    self.assertTrue(mode & S_IRUSR)
+        finally:
+            tempdir.chmod(0o700)
+            tempdir.rmdir()
+
+    def test_chmod_recursive(self):
+        tempdir = Path(mkdtemp())
+        subdir = tempdir / 'sub'
+        subdir.mkdir()
+        testfile = subdir / 'file.txt'
+        testfile.write_text('test')
+        try:
+            chmod(tempdir, 0o755, recursive=True)
+            match platform:
+                case 'win32':
+                    pass  # Windows chmod is limited
+                case _:
+                    self.assertTrue(subdir.stat().st_mode & S_IRUSR)
+                    self.assertTrue(testfile.stat().st_mode & S_IRUSR)
+        finally:
+            rmtree_hard(tempdir)
+
+    def test_chmod_files_only(self):
+        tempdir = Path(mkdtemp())
+        testfile = tempdir / 'file.txt'
+        testfile.write_text('test')
+        try:
+            original_dir_mode = tempdir.stat().st_mode
+            chmod(tempdir, 0o644, recursive=True, files_only=True)
+            self.assertEqual(tempdir.stat().st_mode, original_dir_mode)
+        finally:
+            rmtree_hard(tempdir)
+
+
+class TestDirStack(TestCase):
+    def setUp(self):
+        self._tempdir = Path(mkdtemp()).resolve()
+
+    def tearDown(self):
+        self._tempdir.rmdir()
+
+    def test_popd_empty_stack(self):
+        self.assertEqual(popd(), 0)
+
+    def test_push_and_pop(self):
+        start = Path.cwd()
+
+        old_dir = pushd(self._tempdir)
+        new_dir = Path.cwd()
+        self.assertEqual(old_dir, start)
+        self.assertEqual(new_dir, self._tempdir)
+
+        old_dir = popd()
+        new_dir = Path.cwd()
+        self.assertEqual(old_dir, start)
+        self.assertEqual(new_dir, start)
+
+
 class TestExceptions(TestCase):
     def test_PlatformException(self):
         try:
