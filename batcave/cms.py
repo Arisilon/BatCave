@@ -643,11 +643,12 @@ class Client:
                 return self._p4run('have')
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
-    def add_files(self, *files: PathName, no_execute: bool = False) -> List[str]:
+    def add_files(self, *files: PathName, all_files: bool = False, no_execute: bool = False) -> List[str]:
         """Add files to the client.
 
         Args:
             *files: The files to add.
+            all_files (optional, default=False): If True, add all files.
             no_execute (optional, default=False): If True, run the command but don't commit the results.
 
         Returns:
@@ -661,6 +662,8 @@ class Client:
                 pass
             case ClientType.git:
                 if not no_execute:
+                    if all_files:
+                        return self._client.git.add('--all')
                     return self._client.index.add([str(f) for f in files])
             case ClientType.perforce:
                 args: List[str] = ['-n'] if no_execute else []
@@ -718,14 +721,17 @@ class Client:
                     return self._client.create_remote(name, url)
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
-    def checkin_files(self, description: str, /, *files: str, all_branches: bool = False, remote: str = 'origin',
-                      fail_on_empty: bool = False, no_execute: bool = False, **extra_args) -> List[str]:
+    def checkin_files(self, description: str, /, *files: str, all_branches: bool = False, all_files: bool = False, remote: str = 'origin',
+                      remote_ref: Optional[str] = None, fail_on_empty: bool = False, no_execute: bool = False, **extra_args) -> List[str]:
         """Commit open files on the client.
 
         Args:
             description: A description of the changes.
             *files (optional): If provided, a subset of the files to commit, otherwise all will be submitted.
             all_branches (optional, default=False): If True, commit all branches, otherwise only the current branch.
+            all_files (optional, default=False): If True, commit all files, otherwise only the specified files.
+            remote (optional, default='origin'): The remote to which to push the changes for git clients.
+            remote_ref (optional, default=None): The remote ref to which to push the changes for git clients. If not provided, the default remote ref will be used.
             fail_on_empty (optional, default=False): If True, raise an error if there are no files to commit, otherwise just return.
             no_execute (optional, default=False): If True, run the command but don't commit the results.
             **extra_args (optional): Any extra API specific arguments or the commit.
@@ -744,7 +750,13 @@ class Client:
                 return []
             case ClientType.git:
                 if not no_execute:
-                    self._client.index.commit(description)
+                    if all_files:
+                        self._client.git.commit('-a', '-m', description)
+                    else:
+                        self._client.index.commit(description)
+                    if remote_ref:
+                        return self._client.git.push(remote, remote_ref)
+
                     args: Dict[str, bool] = ({'set_upstream': True, 'all': True} if all_branches else {}) | extra_args
                     progress = git_remote_progress()
                     result = getattr(self._client.remotes, remote).push(progress=progress, **args)
@@ -831,8 +843,8 @@ class Client:
             self._p4run('disconnect')
             self._connected = False
 
-    def create_branch(self, name: str, /, *, branch_from: str = '', repo: str = '',
-                      branch_type: str = '', options: Optional[Dict[str, str]] = None, no_execute: bool = False) -> List[str]:
+    def create_branch(self, name: str, /, *, branch_from: str = '', repo: str = '', branch_type: str = '', remote_branch: str = '',
+                      options: Optional[Dict[str, str]] = None, no_execute: bool = False) -> List[str]:
         """Create the specified branch.
 
         Args:
@@ -875,6 +887,26 @@ class Client:
                 if no_execute:
                     return []
                 return self._client.git.push('origin', name, set_upstream=True)
+        raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
+
+    def delete_branch(self, name: str, /, *, no_execute: bool = False) -> List[str]:
+        """Delete the specified branch.
+
+        Args:
+            name: The name of the branch to delete.
+            no_execute (optional, default=False): If True, run the command but don't revert the files.
+
+        Returns:
+            The result of the branch delete command.
+
+        Raises:
+            CMSError.INVALID_OPERATION: If the client CMS type is not supported.
+        """
+        match self._type:
+            case ClientType.git:
+                if no_execute:
+                    return []
+                return self._client.git.push('origin', '--delete', name)
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
     def create_repo(self, repository: str, /, *, repo_type: Optional[str] = None, no_execute: bool = False) -> List[str]:
@@ -1367,11 +1399,30 @@ class Client:
                 return []
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
-    def switch(self, branch: str, /) -> List[str]:
+    def set_remote(self, branch: str, /, name: str = 'origin') -> List[str]:
+        """Set the remote for the specified branch.
+
+        Args:
+            branch: The branch for which to set the remote.
+            name (optional, default='origin'): The name of the remote.
+
+        Returns:
+            The result of the set remote command.
+
+        Raises:
+            CMSError.INVALID_OPERATION: If the client CMS type is not supported.
+        """
+        match self._type:
+            case ClientType.git:
+                return self._client.git.branch('--set-upstream-to', f'{name}/{branch}')
+        raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
+
+    def switch(self, branch: str, /, reset: bool = False) -> List[str]:
         """Switch to the specified branch.
 
         Args:
             branch: The branch to which to switch.
+            reset (optional, default=False): If True, reset the branch to the remote state.
 
         Returns:
             The result of the switch command.
@@ -1381,6 +1432,8 @@ class Client:
         """
         match self._type:
             case ClientType.git:
+                if reset:
+                    return self._client.git.reset(branch)
                 self._client.git.fetch('--all')
                 if branch not in {b.name.removeprefix('origin/') for b in self.branches}:
                     self.create_branch(branch)
@@ -1445,7 +1498,8 @@ class Client:
                 return self._p4run('unedit', *args)
         raise CMSError(CMSError.INVALID_OPERATION, ctype=self._type.name)
 
-    def update(self, *files: str, limiters: Optional[str] = None, force: bool = False, parallel: bool = False, no_execute: bool = False) -> List[str]:
+    def update(self, *files: str, limiters: Optional[str] = None, force: bool = False,
+               parallel: bool = False, rebase: Optional[str] = None, no_execute: bool = False) -> List[str]:
         """Update the local client files.
 
         Args:
@@ -1453,6 +1507,7 @@ class Client:
             limiters (optional, default=None): Arguments to limit the updated files.
             force (optional, default=False): If True update files that are already up-to-date.
             parallel (optional, default=False): If True update files in parallel.
+            rebase (optional, default=None): If not None, rebase the changes onto the specified branch.
             no_execute (optional, default=False): If True, run the command but don't commit the results.
 
         Returns:
@@ -1465,6 +1520,8 @@ class Client:
             case ClientType.file:
                 pass
             case ClientType.git:
+                if rebase:
+                    return self._client.git.pull('--rebase', 'origin', rebase)
                 info = self._client.remotes.origin.pull()[0]
                 return info.note if info.note else info.ref
             case ClientType.perforce:

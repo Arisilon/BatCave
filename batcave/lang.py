@@ -174,7 +174,7 @@ def yaml_to_dotmap(yaml_info: str | PathName, /) -> DotMap:
         return DotMap(yaml_load(yaml_stream))
 
 
-def flatten(thing: Iterable[Iterable], /, *, recursive: bool = True) -> Iterable:
+def flatten(thing: Iterable[Any], /, *, recursive: bool = True) -> Iterable:
     """Flatten an iterable of iterables.
 
     Args:
@@ -187,11 +187,14 @@ def flatten(thing: Iterable[Iterable], /, *, recursive: bool = True) -> Iterable
     flattened = False
     result = []
     for item in thing:
-        try:
-            result += [i for i in iter(item)]  # pylint: disable=unnecessary-comprehension
-            flattened = True
-        except TypeError:
+        if isinstance(item, str):
             result.append(item)
+        else:
+            try:
+                result += [i for i in iter(item)]  # pylint: disable=unnecessary-comprehension
+                flattened = True
+            except TypeError:
+                result.append(item)
 
     if recursive and flattened:
         return flatten(result)
