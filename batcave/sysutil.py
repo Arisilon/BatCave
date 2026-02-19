@@ -16,7 +16,8 @@ import sys
 from copy import copy as copy_object
 from enum import Enum
 from errno import EACCES, EAGAIN, ECHILD
-from os import chdir, getenv, remove, unlink
+from os import chdir, getenv
+from time import sleep
 from pathlib import Path
 from shutil import rmtree, chown as os_chown
 from stat import S_IRUSR, S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH, S_IRWXU, S_IRWXG, S_IXOTH
@@ -44,6 +45,9 @@ S_660 = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP
 S_664 = S_660 | S_IROTH
 S_770 = S_IRWXU | S_IRWXG
 S_775 = S_770 | S_IROTH | S_IXOTH
+
+_RMTREE_MAX_RETRIES = 5
+_RMTREE_RETRY_DELAY = 0.5
 
 type ServerAuthType = str | Path | Tuple[str, str] | None
 
@@ -401,29 +405,43 @@ def rmtree_hard(tree: PathName, /) -> None:
     Returns:
         Nothing.
     """
-    Path(tree).chmod(S_IRWXU)
+    tree = Path(tree).resolve()
+    try:
+        cwd = Path.cwd().resolve()
+    except OSError:
+        cwd = None
+    if cwd and ((cwd == tree) or (tree in cwd.parents)):
+        print(f'Current working directory {cwd} is within the tree {tree} to be removed, changing to parent of tree')
+        chdir(tree.parent)
+    tree.chmod(S_IRWXU)
     rmtree(tree, onexc=_rmtree_onerror)
 
 
-def _rmtree_onerror(caller: Callable, path_str: PathName, excinfo: Any) -> None:
+def _rmtree_onerror(caller: Callable, path_str: PathName, exc: BaseException) -> None:
     """The exception handler used by rmtree_hard to try to remove read-only attributes.
 
     Args:
         caller: The calling function.
         path_str: The path to change.
-        excinfo: The run stack to use if the caller is not remove or unlink.
+        exc: The exception raised.
 
     Returns:
         Nothing.
 
     Raises:
-        The exception in excinfo if the caller is not remove or unlink.
+        The original exception if all retries are exhausted.
     """
     path_str = Path(path_str)
-    if caller not in (remove, unlink):
-        raise excinfo[0](excinfo[1])
     path_str.chmod(S_IRWXU)
-    path_str.unlink()
+    for attempt in range(_RMTREE_MAX_RETRIES):
+        try:
+            caller(path_str)
+            return
+        except PermissionError:
+            if attempt < _RMTREE_MAX_RETRIES - 1:
+                sleep(_RMTREE_RETRY_DELAY)
+            else:
+                raise exc from exc
 
 
 def _construct_remote_driver(remote: Optional[bool | str] = False, remote_is_windows: Optional[bool] = None, copy_for_remote: bool = False,  # pylint: disable=too-many-locals,too-many-branches
@@ -627,4 +645,4 @@ def popd() -> int | PathName:
     chdir(dirname)
     return dirname
 
-# cSpell:ignore chgrp geteuid getpwnam IRGRP IROTH IRWXG IXOTH lockf NBLCK nobanner psexec pylance syscmd unlck ungrouped accepteula onexc
+# cSpell:ignore nblck unlck geteuid getpwnam lockf syscmd chgrp localappdata onexc psexec accepteula nobanner

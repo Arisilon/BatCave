@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [47.1.1] - 2026-02-18
+
+- Changed:
+  - Fixed bug which prevented rmtree from working in some cases. (GitHub #137)
+
+## Release History
+
 ### [47.1.0] - 2026-02-17
 
 - Added:
@@ -24,8 +31,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Changed:
   - Fixed bug in flatten where strings were being iterated.
-
-## Release History
 
 ### [47.0.0] - 2026-02-12
 

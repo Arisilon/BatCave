@@ -5,7 +5,7 @@
 
 from enum import Enum
 from multiprocessing import Process, Queue
-from os import fdopen, getenv
+from os import chdir, fdopen, getcwd, getenv
 from pathlib import Path
 from stat import S_IRGRP, S_IROTH, S_IRUSR
 from sys import platform
@@ -240,6 +240,26 @@ class TestRmtreeHard(TestCase):
         readonly_file.chmod(S_IRUSR | S_IRGRP | S_IROTH)
         rmtree_hard(tempdir)
         self.assertFalse(tempdir.exists())
+
+    def test_remove_readonly_directory(self):
+        tempdir = Path(mkdtemp())
+        readonly_dir = tempdir / 'readonly_dir'
+        readonly_dir.mkdir()
+        (readonly_dir / 'file.txt').write_text('test')
+        readonly_dir.chmod(S_IRUSR | S_IRGRP | S_IROTH)
+        rmtree_hard(tempdir)
+        self.assertFalse(tempdir.exists())
+
+    def test_remove_tree_while_cwd_inside(self):
+        tempdir = Path(mkdtemp())
+        original_cwd = getcwd()
+        try:
+            chdir(tempdir)
+            rmtree_hard(tempdir)
+            self.assertFalse(tempdir.exists())
+        finally:
+            if Path(original_cwd).exists():
+                chdir(original_cwd)
 
 
 class TestSysCmd(TestCase):
