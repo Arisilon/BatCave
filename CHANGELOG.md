@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
-### [47.1.1] - 2026-02-18
+### [47.1.1] - 2026-02-19
 
 - Changed:
   - Fixed bug which prevented rmtree from working in some cases. (GitHub #137)
