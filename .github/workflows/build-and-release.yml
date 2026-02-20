@@ -25,7 +25,7 @@ permissions:
 
 jobs:
   ci-cd:
-    uses: arisilon/shared-actions/.github/workflows/python-cicd.yaml@released
+    uses: arisilon/shared-actions/.github/workflows/python-cicd.yaml@main
     with:
       skip-pypi-test: ${{ inputs.skip-pypi-test || false }}
       test-action: "python -c 'import batcave; print(batcave.__version__)'"
