@@ -15,7 +15,7 @@ Attributes:
 import sys
 from copy import copy as copy_object
 from enum import Enum
-from errno import EACCES, EAGAIN, ECHILD
+from errno import EACCES, EAGAIN, ECHILD, ENOTEMPTY
 from os import chdir, getenv
 from time import sleep
 from pathlib import Path
@@ -432,13 +432,29 @@ def _rmtree_onerror(caller: Callable, path_str: PathName, exc: BaseException) ->
         The original exception if all retries are exhausted.
     """
     path_str = Path(path_str)
-    path_str.chmod(S_IRWXU)
+
+    def _fix_permissions(path: Path) -> None:
+        try:
+            path.chmod(S_IRWXU)
+        except OSError:
+            pass
+
+    _fix_permissions(path_str)
+    _fix_permissions(path_str.parent)
+
     for attempt in range(_RMTREE_MAX_RETRIES):
         try:
             caller(path_str)
             return
-        except PermissionError:
+        except FileNotFoundError:
+            return
+        except OSError as err:
+            if err.errno == ENOTEMPTY and path_str.exists() and path_str.is_dir():
+                rmtree(path_str, onexc=_rmtree_onerror)
+                return
             if attempt < _RMTREE_MAX_RETRIES - 1:
+                _fix_permissions(path_str)
+                _fix_permissions(path_str.parent)
                 sleep(_RMTREE_RETRY_DELAY)
             else:
                 raise exc from exc
@@ -645,4 +661,4 @@ def popd() -> int | PathName:
     chdir(dirname)
     return dirname
 
-# cSpell:ignore nblck unlck geteuid getpwnam lockf syscmd chgrp localappdata onexc psexec accepteula nobanner
+# cSpell:ignore nblck unlck geteuid getpwnam lockf syscmd chgrp localappdata onexc psexec accepteula nobanner enotempty
