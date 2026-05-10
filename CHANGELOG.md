@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+- Removed google from Android install
+
 ### [47.1.1] - 2026-02-19
 
 - Changed:
