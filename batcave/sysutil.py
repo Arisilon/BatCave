@@ -622,7 +622,7 @@ def syscmd(command: PathName, /, *cmd_args, input_lines: Optional[Iterable] = No
 
 
 # Implement standard directory stack on chdir
-_DIRECTORY_STACK = []
+_DIRECTORY_STACK: list[PathName] = []
 
 
 def pushd(dirname: PathName, /) -> PathName:

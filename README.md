@@ -4,11 +4,7 @@ A useful collection of tools for writing Python programs.
 
 ## Developing
 
-Development is best accomplished using virtualenv or virtualenv-wrapper where a virtual environment can be generated:
-
-    UNIX: util/new-env.sh
-    Windows: util\New-Env.ps1
-
+Development is best accomplished using virtualenv or virtualenv-wrapper.
 To update the current development environment
 
     UNIX: util/update-env.sh
