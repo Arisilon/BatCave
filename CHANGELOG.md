@@ -7,14 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
-- Removed google from Android install
+### [47.1.1] - 2026-02-19
+
+- Changed:
+  - Upgraded to Python 3.14. (GitHub #131)
+
+- Removed:
+  - Removed google from Android install
+
+## Release History
 
 ### [47.1.1] - 2026-02-19
 
 - Changed:
   - Fixed bug which prevented rmtree from working in some cases. (GitHub #137)
-
-## Release History
 
 ### [47.1.0] - 2026-02-17
 
