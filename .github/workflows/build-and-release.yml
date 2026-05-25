@@ -28,5 +28,5 @@ jobs:
     uses: arisilon/shared-actions/.github/workflows/python-cicd.yaml@released
     with:
       skip-pypi-test: ${{ inputs.skip-pypi-test || false }}
-      test-action: "python -c 'import batcave; print(batcave.__version__)'"
+      install-test-action: "python -c 'import batcave; print(batcave.__version__)'"
     secrets: inherit
