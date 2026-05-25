@@ -8,4 +8,4 @@ release:
     - type: pypi
       username: __token__
       password: "{var:PYPI_TOKEN}"
-    - type: bumpver
+    - type: increment_release

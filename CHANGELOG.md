@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
-### [47.1.1] - 2026-02-19
+### [48.0.0] - Unreleased
 
 - Changed:
   - Upgraded to Python 3.14. (GitHub #131)

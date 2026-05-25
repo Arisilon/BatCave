@@ -19,12 +19,12 @@ release:
       username: __token__
       password: "{var:PYPI_TOKEN}"
       pre_release_only: true
-    - type: bumpver
+    - type: increment_release
     - type: setuptools_build
       release_only: true
     - type: github
       release_only: true
-    - type: bumpver
+    - type: increment_release
       release_only: true
       args:
         patch: True
