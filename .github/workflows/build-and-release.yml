@@ -29,4 +29,5 @@ jobs:
     with:
       skip-pypi-test: ${{ inputs.skip-pypi-test || false }}
       install-test-action: "python -c 'import batcave; print(batcave.__version__)'"
+      update-changelog: true
     secrets: inherit
