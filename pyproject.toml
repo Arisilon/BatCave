@@ -51,9 +51,18 @@ test = [
     "types-psutil",
     "types-requests",
     "types-pywin32; sys_platform == 'win32'",
-    "unittest-xml-reporting"
+    "unittest-xml-reporting",
 ]
-# doc = []
+doc = [
+    "Sphinx>=7.0,<8",
+    "sphinx-rtd-theme>=1.3,<2",
+    "sphinxcontrib-applehelp>=1.0.2",
+    "sphinxcontrib-devhelp>=1.0.2",
+    "sphinxcontrib-htmlhelp>=1.0.3",
+    "sphinxcontrib-jsmath>=1.0.1",
+    "sphinxcontrib-qthelp>=1.0.3",
+    "sphinxcontrib-serializinghtml>=1.1.4",
+]
 
 [project.urls]
 homepage = "https://github.com/arisilon/batcave/"
@@ -121,4 +130,5 @@ push = true
 [tool.bumpver.file_patterns]
 "batcave/__init__.py" = ["__version__ = '{pep440_version}'"]
 
-# cSpell:ignore buildapi pywin psutil armv bumpver pyproject dateutil pytagnum
+# cSpell:ignore buildapi pywin psutil armv bumpver pyproject dateutil pytagnum sphinxcontrib applehelp
+# cSpell:ignore devhelp jsmath htmlhelp qthelp serializinghtml

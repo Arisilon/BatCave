@@ -30,6 +30,18 @@ The build can be run with
 
     vjer build
 
+### Building docs
+
+To build the documentation locally on Unix/WSL:
+
+    cd docs
+    make html
+
+To build the documentation locally on Windows PowerShell:
+
+    cd docs
+    .\make.bat html
+
 ## Publishing a Release
 
 This is the procedure for releasing BatCave
