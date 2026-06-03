@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use released shared actions.
 - Update input name.
 - Automate change log generation. (GitHub #139)
+- Update documentation build pieces. (GitHub #30)
 
 ### Removed
 
