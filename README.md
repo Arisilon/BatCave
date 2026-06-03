@@ -35,11 +35,13 @@ The build can be run with
 To build the documentation locally on Unix/WSL:
 
     cd docs
+    sphinx-apidoc -o . ../batcave
     make html
 
 To build the documentation locally on Windows PowerShell:
 
     cd docs
+    sphinx-apidoc -o . ..\batcave
     .\make.bat html
 
 ## Publishing a Release
