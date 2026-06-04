@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update input name.
 - Automate change log generation. (GitHub #139)
 - Update documentation build pieces. (GitHub #30)
+- Use new build-docs option in CI/CD workflow. (GitHub #71)
 
 ### Removed
 
