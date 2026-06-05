@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix documentation link.
 - Have ReadTheDocs generate everything. (GitHub #71)
 - Update the copyright year. (GitHub #71)
+- Fix the RTD config. (GitHub #71)
 
 ### Removed
 
