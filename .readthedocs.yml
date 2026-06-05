@@ -6,7 +6,7 @@ build:
     python: "3.14"
   jobs:
     pre_build:
-      - sphinx-apidoc -f -o docs ../batcave
+      - sphinx-apidoc -f -o docs batcave
 
 python:
   install:
