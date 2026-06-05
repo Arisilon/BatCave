@@ -27,7 +27,6 @@ jobs:
   ci-cd:
     uses: arisilon/shared-actions/.github/workflows/python-cicd.yaml@main
     with:
-      build-docs: true
       install-test-action: "python -c 'import batcave; print(batcave.__version__)'"
       skip-pypi-test: ${{ inputs.skip-pypi-test || false }}
       update-changelog: true

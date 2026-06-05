@@ -12,6 +12,7 @@ test:
 build:
   steps:
     - type: setuptools
+    # - type: sphinx
 release:
   steps:
     - type: pypi

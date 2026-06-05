@@ -30,20 +30,6 @@ The build can be run with
 
     vjer build
 
-### Building docs
-
-To build the documentation locally on Unix/WSL:
-
-    cd docs
-    sphinx-apidoc -o . ../batcave
-    make html
-
-To build the documentation locally on Windows PowerShell:
-
-    cd docs
-    sphinx-apidoc -o . ..\batcave
-    .\make.bat html
-
 ## Publishing a Release
 
 This is the procedure for releasing BatCave
