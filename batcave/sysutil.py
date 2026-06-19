@@ -15,7 +15,7 @@ Attributes:
 import sys
 from copy import copy as copy_object
 from enum import Enum
-from errno import EACCES, EAGAIN, ECHILD, ENOTEMPTY
+from errno import EACCES, EAGAIN, ENOTEMPTY
 from os import chdir, getenv
 from time import sleep
 from pathlib import Path
@@ -578,30 +578,18 @@ def syscmd(command: PathName, /, *cmd_args, input_lines: Optional[Iterable] = No
             cast(IO, proc.stdin).close()
 
         if is_debug('SYSCMD'):
-            print('Getting output lines')
-        outlines = []
-        for line in iter(cast(IO, proc.stdout).readline, ''):
-            if is_debug('SYSCMD'):
-                print('Received output line:', line)
-            outlines.append(line)
-            if show_stdout:
-                sys.stdout.write(line)
+            print('Waiting for process output')
+        out, err = proc.communicate()
 
-        if is_debug('SYSCMD'):
-            print('Getting error lines')
-        err_lines = cast(IO, proc.stderr).readlines()
+        outlines = out.splitlines(keepends=True) if out else []
+        err_lines = err.splitlines(keepends=True) if err else []
+
+        if show_stdout and outlines:
+            sys.stdout.write(''.join(outlines))
+
         if is_debug('SYSCMD'):
             print('Received error lines:', err_lines)
-
-        if is_debug('SYSCMD'):
-            print('Getting return code')
-        try:
-            returncode = proc.wait()
-        except OSError as err:
-            if err.errno == ECHILD:
-                returncode = proc.returncode
-            else:
-                raise
+        returncode = proc.returncode
 
     if is_debug('SYSCMD'):
         print('Received return code:', returncode)
@@ -661,4 +649,5 @@ def popd() -> int | PathName:
     chdir(dirname)
     return dirname
 
-# cSpell:ignore nblck unlck geteuid getpwnam lockf syscmd chgrp localappdata onexc psexec accepteula nobanner enotempty
+# cSpell:ignore nblck unlck geteuid getpwnam lockf syscmd chgrp localappdata
+# cSpell:ignore onexc psexec accepteula nobanner enotempty keepends
