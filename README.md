@@ -12,17 +12,9 @@ To update the current development environment
 
 ## Testing
 
-### Static Analysis
-
-The static analysis test can be run with
+The test suite can be run with
 
     vjer test
-
-### Unit Tests
-
-The unit tests can be run with
-
-    python -m unittest -v [tests.test_suite[.test_class[.test_case]]]
 
 ## Building
 
