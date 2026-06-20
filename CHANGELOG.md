@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add automation module tests. (GitHub # 138)
+
 ### Changed
 
 - Test the new shared-action.
@@ -26,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Remove Google SDK from Android install.
+- Remove unused ECHILD import from sysutil.
 
 ## [47.1.1] - 2026-02-20
 
