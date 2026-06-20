@@ -244,3 +244,4 @@ docs/batcave.rst
 docs/modules.rst
 test_results*/
 tmp/
+.git/
