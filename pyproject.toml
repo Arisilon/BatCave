@@ -38,7 +38,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["bumpver", "vjer"]
+dev = ["bumpver", "git-cliff", "vjer"]
 test = [
     "flake8",
     "flake8-annotations",
