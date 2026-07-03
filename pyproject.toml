@@ -113,7 +113,7 @@ ignore_missing_imports = true
 [tool.bumpver]
 current_version = "48.0.1rc0"
 version_pattern = "MAJOR.MINOR.PATCH[PYTAGNUM]"
-commit_message = "bump version {old_version} -> {new_version} [skip ci]"
+commit_message = "bump version {old_version} -> {new_version} [skip ci][skip cl]"
 commit = true
 tag = false
 push = true
