@@ -218,6 +218,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Fix token variable.
+- Switch to OICD for publishing. (GitHub #111)
+- Fix publish job permissions.
+- Improve CI/CD script.
+- Fix release publish.
+- Update release instructions.
+- Replaced the versbose argument to fileutil.prune with log_handle. (GitHub #112)
 - Merge remote-tracking branch 'origin/release/v43.2'.
 - Fix change log.
 - Start adding Vjer build support. (GitHub #109)
@@ -232,6 +239,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update change log.
 - Fix publish jobs.
 - Fix publish.
+
+### Removed
+
+- Remove obsolete comment.
 
 ## [43.2.3] - 2024-04-11
 
@@ -260,21 +271,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Fix token variable.
-- Switch to OICD for publishing. (GitHub #111)
-- Fix publish job permissions.
-- Improve CI/CD script.
-- Fix release publish.
-- Update release instructions.
-- Replaced the versbose argument to fileutil.prune with log_handle. (GitHub #112)
 - Update publish tokens.
 - Fix publish permissions.
 - Fix relelase publish.
 - Fix release number.
-
-### Removed
-
-- Remove obsolete comment.
 
 ## [43.1.1] - 2024-03-19
 
@@ -640,6 +640,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added more docstrings. (GitLab #29)
+- Add module level doctrings, including attributes. (GitLab #29)
+- Added module level function docstrings for neutil, servermgr, version. (GitLab #29)
+- Add function level docstrings to land and sysutil. (GitLab #29)
+- Add class docstrings for data module. (GitLab #29)
+- Add class docstrings to the expander module. (GitLab #29)
+- Add class docstrings to fileutil module. (GitLab #29)
+- Add class docstrings to gui module. (GitLab #29)
+- Added more class docstrings. (GitLab #29)
+- Add more Error docstrings. (GitLab #29)
+- Added remaining error docstrings. (GitLab #29)
+- Add docstrings to the class init methods for commander and configmgr. (GitLab #29)
+- Added docstrings for class init methods for the expander module. (GitLab #29)
+- Added docstrings for class init methods for the fileutil and gui modules. (GitLab #29)
+- Added docstrings for class init methods for the iispy and k8s modules. (GitLab #29)
+- Added docstrings for class init methods for the lang and logger modules. (GitLab #29)
+- Added docstrings for class init methods for the menu module. (GitLab #29)
+- Added docstrings for class init methods for the qbpy module. (GitLab #29)
+- Added docstrings for class init methods for the tcpy module. (GitLab #29)
+- Added docstrings for class init methods for the reporter, statemachine, and sysutil modules. (GitLab #29)
+- Added docstrings for class init methods for the servermgr module load balancer objects. (GitLab #29)
+- Added docstrings for class init methods for servermgr module objects. (GitLab #29)
+- Added class property docstrings for the cloudmgr module. (GitLab #29)
+- Added class property docstrings for the cms.Label class. (GitLab #29)
+- Added class property docstrings for the cms and configmgr modules. (GitLab #29)
+- Added class property docstrings for the data module. (GitLab #29)
+- Added class property docstrings for the expander, iispy, k8s, and logger modules. (GitLab #29)
+- Added class property docstrings for the qbpy module. (GitLab #29)
+- Added class property docstrings for the reporter module. (GitLab #29)
+- Added class property docstrings for the servermgr and tcpy modules. (GitLab #29)
+- Added class method docstrings for the automation module. (GitLab #29)
+- Added class method docstrings for the cloudmgr module. (GitLab #29)
+- Added class method docstrings for the cms.Label class. (GitLab #29)
+- Added class method docstrings for the commander and configmgr modules. (GitLab #29)
+- Added class method docstrings for the expander module. (GitLab #29)
+- Added class method docstrings for the gui module. (GitLab #29)
+- Added class method docstrings for the lang, logger, menu, and platarch modules. (GitLab #29)
+- Added class method docstrings for the qbpy module. (GitLab #29)
+- Added class method docstrings for the reporter module. (GitLab #29)
+- Add nitrosdl-python, psutil, and wmi modules. (Gitlab #8)
+- Added class method docstrings for the statemachine module. (GitLab #29)
+- Added class method docstrings for the sysutil module. (GitLab #29)
+- Added class method docstrings for the tcpy module. (GitLab #29)
+- Added class method docstrings for the loadbalancer module. (GitLab #29)
+- Added class method docstrings for the serverpath module. (GitLab #29)
+- Added PEP484 type hints to automation module. (GitLab #29)
+- Added PEP484 type hints to cloudmgr module. (GitLab #29)
 - Added PEP484 type hints to expander module. (GitLab #29)
 - Added PEP484 type hints to fileutil module. (GitLab #29)
 - Added PEP484 type hints to gui module. (GitLab #29)
@@ -667,6 +714,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Lint cleanup. (GitLab #33)
+- Set -x on build script for Linux.
+- Create PyPi facing README-USER. (GitLab #26)
+- Fix filetype.
+- Fix build after new PyPi long description. (GitLab #26)
+- More variable renames due to rename to BatCave. (GitLab #27)
+- Start creating improved docstrings. (GitLab #29)
+- Update docstrings for automation module. (GitLab #29.)
+- Move cSpell ignores to bottom. (GitLab #29)
+- Start adding module function docstrings. (GitLab #29)
+- Start adding class docstrings. (GitLab #29)
+- Finished adding class docstrings. (GitLab #29)
+- Started adding docstrings to Error classes. (GitLab #29)
+- Started adding class init docstrings. (GitLab #29)
+- Finish the CMS module init docstrings. (GitLab #29)
+- Update TODO list. (GitLab #29)
+- Started adding init docstrings to expander. (GitLab #29)
+- Continued adding init docstrings to expander. (GitLab #29)
+- Finished adding docstrings for class init methods for servermgr module objects. (GitLab #29)
+- Fixed the class property docstrings for the cloudmgr module. (GitLab #29)
+- Update .gitlab-ci.yml
+- Started adding class method docstrings for cms.Client. (GitLab #29)
+- Continued adding class method docstrings for cms.Client. (GitLab #29)
+- Fixes after last updates. (GitLab #29)
+- Finished adding class method docstrings for the cms module. (GitLab #29)
+- Fix CHANGELOG lint warning.
+- Started adding class method docstrings for the data module. (GitLab #29)
+- Continued adding class method docstrings for the data module. (GitLab #29)
+- Finished adding class method docstrings for the data module. (GitLab #29)
+- Started adding class method docstrings for the expander module. (GitLab #29)
+- Started adding class method docstrings for the k8s module. (GitLab #29)
+- Update TODO list.
+- Started adding class method docstrings for the iispy module. (GitLab #29)
+- Continued adding class method docstrings for the iispy module. (GitLab #29)
+- Finished adding class method docstrings for the iispy module. (GitLab #29)
+- Continued adding class method docstrings for the k8s module. (GitLab #29)
+- Finished adding class method docstrings for the k8s module. (GitLab #29)
+- Try to fix freeze logic.
+- Update Python and frozen requirements.
+- Move load balancer support from servermgr to new loadbalancer module. (GitLab #46)
+- Started adding class method docstrings for the servermgr module. (GitLab #29)
+- Continued adding class method docstrings for the servermgr module. (GitLab #29)
+- Move ServerPath from servermgr to a new module.
+- Finished adding class method docstrings for the servermgr module. (GitLab #29)
+- Reordered class members alphabetically by type. (GitLab #29)
+- Started adding PEP484 type hints to cms module. (GitLab #29)
+- Finished adding PEP484 type hints to cms module. (GitLab #29)
 - Update release number and fix bad pipline on tags.
 - Finished adding PEP484 type hints to commander module. (GitLab #29)
 - GitLab #29:
@@ -754,57 +848,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Finished adding PEP484 type hints to cms module. (GitLab #29)
 - Pass Kubernetes API call parameters to exec call. (GitLab #48)
 - Fix release number.
 
 ## [38.1.1] - 2020-05-05
 
-### Added
-
-- Added class method docstrings for the cms.Label class. (GitLab #29)
-- Added class method docstrings for the commander and configmgr modules. (GitLab #29)
-- Added class method docstrings for the expander module. (GitLab #29)
-- Added class method docstrings for the gui module. (GitLab #29)
-- Added class method docstrings for the lang, logger, menu, and platarch modules. (GitLab #29)
-- Added class method docstrings for the qbpy module. (GitLab #29)
-- Added class method docstrings for the reporter module. (GitLab #29)
-- Add nitrosdl-python, psutil, and wmi modules. (Gitlab #8)
-- Added class method docstrings for the statemachine module. (GitLab #29)
-- Added class method docstrings for the sysutil module. (GitLab #29)
-- Added class method docstrings for the tcpy module. (GitLab #29)
-- Added class method docstrings for the loadbalancer module. (GitLab #29)
-- Added class method docstrings for the serverpath module. (GitLab #29)
-- Added PEP484 type hints to automation module. (GitLab #29)
-- Added PEP484 type hints to cloudmgr module. (GitLab #29)
-
 ### Changed
 
-- Started adding class method docstrings for cms.Client. (GitLab #29)
-- Continued adding class method docstrings for cms.Client. (GitLab #29)
-- Fixes after last updates. (GitLab #29)
-- Finished adding class method docstrings for the cms module. (GitLab #29)
-- Fix CHANGELOG lint warning.
-- Started adding class method docstrings for the data module. (GitLab #29)
-- Continued adding class method docstrings for the data module. (GitLab #29)
-- Finished adding class method docstrings for the data module. (GitLab #29)
-- Started adding class method docstrings for the expander module. (GitLab #29)
-- Started adding class method docstrings for the k8s module. (GitLab #29)
-- Update TODO list.
-- Started adding class method docstrings for the iispy module. (GitLab #29)
-- Continued adding class method docstrings for the iispy module. (GitLab #29)
-- Finished adding class method docstrings for the iispy module. (GitLab #29)
-- Continued adding class method docstrings for the k8s module. (GitLab #29)
-- Finished adding class method docstrings for the k8s module. (GitLab #29)
-- Try to fix freeze logic.
-- Update Python and frozen requirements.
-- Move load balancer support from servermgr to new loadbalancer module. (GitLab #46)
-- Started adding class method docstrings for the servermgr module. (GitLab #29)
-- Continued adding class method docstrings for the servermgr module. (GitLab #29)
-- Move ServerPath from servermgr to a new module.
-- Finished adding class method docstrings for the servermgr module. (GitLab #29)
-- Reordered class members alphabetically by type. (GitLab #29)
-- Started adding PEP484 type hints to cms module. (GitLab #29)
 - Set the required WMI version to be less than 1.5. (GitLab #47)
 - Fix WMI setup version specification. (GitLab #47)
 - Fix release number.
@@ -828,67 +878,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [38.0.1] - 2020-02-13
 
-### Added
-
-- Added more docstrings. (GitLab #29)
-- Add module level doctrings, including attributes. (GitLab #29)
-- Added module level function docstrings for neutil, servermgr, version. (GitLab #29)
-- Add function level docstrings to land and sysutil. (GitLab #29)
-- Add class docstrings for data module. (GitLab #29)
-- Add class docstrings to the expander module. (GitLab #29)
-- Add class docstrings to fileutil module. (GitLab #29)
-- Add class docstrings to gui module. (GitLab #29)
-- Added more class docstrings. (GitLab #29)
-- Add more Error docstrings. (GitLab #29)
-- Added remaining error docstrings. (GitLab #29)
-- Add docstrings to the class init methods for commander and configmgr. (GitLab #29)
-- Added docstrings for class init methods for the expander module. (GitLab #29)
-- Added docstrings for class init methods for the fileutil and gui modules. (GitLab #29)
-- Added docstrings for class init methods for the iispy and k8s modules. (GitLab #29)
-- Added docstrings for class init methods for the lang and logger modules. (GitLab #29)
-- Added docstrings for class init methods for the menu module. (GitLab #29)
-- Added docstrings for class init methods for the qbpy module. (GitLab #29)
-- Added docstrings for class init methods for the tcpy module. (GitLab #29)
-- Added docstrings for class init methods for the reporter, statemachine, and sysutil modules. (GitLab #29)
-- Added docstrings for class init methods for the servermgr module load balancer objects. (GitLab #29)
-- Added docstrings for class init methods for servermgr module objects. (GitLab #29)
-- Added class property docstrings for the cloudmgr module. (GitLab #29)
-- Added class property docstrings for the cms.Label class. (GitLab #29)
-- Added class property docstrings for the cms and configmgr modules. (GitLab #29)
-- Added class property docstrings for the data module. (GitLab #29)
-- Added class property docstrings for the expander, iispy, k8s, and logger modules. (GitLab #29)
-- Added class property docstrings for the qbpy module. (GitLab #29)
-- Added class property docstrings for the reporter module. (GitLab #29)
-- Added class property docstrings for the servermgr and tcpy modules. (GitLab #29)
-- Added class method docstrings for the automation module. (GitLab #29)
-- Added class method docstrings for the cloudmgr module. (GitLab #29)
-
 ### Changed
 
-- Lint cleanup. (GitLab #33)
-- Set -x on build script for Linux.
-- Create PyPi facing README-USER. (GitLab #26)
-- Fix filetype.
-- Fix build after new PyPi long description. (GitLab #26)
-- More variable renames due to rename to BatCave. (GitLab #27)
-- Start creating improved docstrings. (GitLab #29)
-- Update docstrings for automation module. (GitLab #29.)
-- Move cSpell ignores to bottom. (GitLab #29)
-- Start adding module function docstrings. (GitLab #29)
-- Start adding class docstrings. (GitLab #29)
-- Finished adding class docstrings. (GitLab #29)
-- Started adding docstrings to Error classes. (GitLab #29)
-- Started adding class init docstrings. (GitLab #29)
-- Finish the CMS module init docstrings. (GitLab #29)
-- Update TODO list. (GitLab #29)
-- Started adding init docstrings to expander. (GitLab #29)
-- Continued adding init docstrings to expander. (GitLab #29)
-- Finished adding docstrings for class init methods for servermgr module objects. (GitLab #29)
-- Fixed the class property docstrings for the cloudmgr module. (GitLab #29)
-- Update .gitlab-ci.yml
 - Fixed str_to_pythonval when ~ in value. (GitLab #42)
 - Allow publish from release branch.
 - Try to allow publishing from a release branch.
+- Update .gitlab-ci.yml
 
 ## [38.0.0] - 2019-10-30
 
