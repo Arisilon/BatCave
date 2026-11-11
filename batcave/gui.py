@@ -145,7 +145,7 @@ class BatCaveBaseGUI:
         if title:
             self.setWindowTitle(title)  # type: ignore[attr-defined]  # pylint: disable=no-member
         if icon:
-            self.setWindowIcon(QIcon(str(find_image(icon))))  # type: ignore[attr-defined,arg-type]  # type: ignore[attr-defined]  # pylint: disable=no-member
+            self.setWindowIcon(QIcon(str(find_image(icon))))  # type: ignore[attr-defined,arg-type]  # pylint: disable=no-member
 
     def closeEvent(self, event: QCloseEvent, /) -> None:
         """Overload of standard Qt method called when the object is closed.
