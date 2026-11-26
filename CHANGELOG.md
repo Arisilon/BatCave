@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add cloudmgr unit tests. (GitHub #140)
+
 ### Changed
 
 - Use a context manager for slurp. (GitHub #142)
+- Update dependencies.
 
 ## [48.0.0] - 2026-06-20
 
