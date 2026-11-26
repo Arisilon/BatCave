@@ -230,7 +230,8 @@ def slurp(filename: PathName, /) -> List[str]:
     Returns:
         The list of lines from the file.
     """
-    return list(open(filename, encoding=DEFAULT_ENCODING))
+    with open(filename, encoding=DEFAULT_ENCODING) as input_stream:
+        return list(input_stream)
 
 
 def spew(filename: PathName, outlines: Iterable, /) -> None:

@@ -10,9 +10,20 @@ from stat import S_IREAD
 from tempfile import mkdtemp
 from time import mktime, time
 from unittest import main, TestCase
+from unittest.mock import mock_open, patch
 
-from batcave.fileutil import prune
+from batcave.fileutil import prune, slurp
 from batcave.sysutil import rmtree_hard
+
+
+class TestSlurp(TestCase):
+    def test_slurp_closes_file(self):
+        open_mock = mock_open(read_data='first line\nsecond line\n')
+
+        with patch('builtins.open', open_mock):
+            self.assertEqual(['first line\n', 'second line\n'], slurp('test.txt'))
+
+        open_mock.return_value.__exit__.assert_called_once_with(None, None, None)
 
 
 class TestPrune(TestCase):
